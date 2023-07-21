@@ -190,23 +190,23 @@ class GameModel: ObservableObject {
             floorBeam.name = "floorBeam"
             floorBeam.position.z += 0.3
             
-            let fireworks = try await Entity.load(named: "fireworks")
+            let fireworks = try await Entity(named: "fireworks")
             globalFireworks = fireworks.children.first!.children.first!
             
             turret = await loadFromRealityComposerPro(named: BundleAssets.heartTurretEntity, fromSceneNamed: BundleAssets.heartTurretScene)
             turret?.name = "Holder"
-            turret?.position = .init(x: 0, y: 0.25, z: -0.7)
+            turret?.position = .init(x: 0, y: 0.25, z: -1.7)
             turret?.scale *= 0.3
             
             heart = await loadFromRealityComposerPro(named: BundleAssets.heartLightEntity, fromSceneNamed: BundleAssets.heartLightScene)
             heart?.name = "Heart Projector"
             heart?.generateCollisionShapes(recursive: true)
-            heart?.position = .init(x: 0, y: 0.25, z: -0.7)
+            heart?.position = .init(x: 0, y: 0.25, z: -1.7)
             heart?.position.y += 0.68
             heart?.scale *= 0.22
             heart?.components[InputTargetComponent.self] = InputTargetComponent(allowedInputTypes: .all)
             
-            cloudTemplate = try? await Entity.load(named: BundleAssets.cloud)
+            cloudTemplate = try? await Entity(named: BundleAssets.cloud)
             
             guard turret != nil, heart != nil, cloudTemplate != nil else {
                 fatalError("Error loading assets.")

@@ -11,8 +11,8 @@ import RealityKit
 /// The structure of the Happy Beam app: a main window and a Full Space for gameplay.
 @main
 struct HappyBeamApp: App {
-    @StateObject var gameModel = GameModel()
-    @State var immersionState: ImmersionStyle = .mixed
+    @StateObject private var gameModel = GameModel()
+    @State private var immersionState: ImmersionStyle = .mixed
     
     var body: some SwiftUI.Scene {
         WindowGroup("HappyBeam", id: "happyBeamApp") {

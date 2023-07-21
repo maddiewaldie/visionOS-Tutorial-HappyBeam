@@ -63,7 +63,7 @@ class HeartGestureModel: ObservableObject, @unchecked Sendable {
                 if type == .handTracking && status != .allowed {
                     // Stop the game, ask the user to grant hand tracking authorization again in Settings.
                 }
-            @unknown default:
+            default:
                 print("Session event \(event)")
             }
         }
@@ -87,16 +87,17 @@ class HeartGestureModel: ObservableObject, @unchecked Sendable {
         }
         
         // Get all required joints and check if they are tracked.
-        let leftHandThumbKnuckle = leftHandAnchor.skeleton.joint(named: .handThumbKnuckle)
-        let leftHandThumbTipPosition = leftHandAnchor.skeleton.joint(named: .handThumbTip)
-        let leftHandIndexFingerTip = leftHandAnchor.skeleton.joint(named: .handIndexFingerTip)
-        let rightHandThumbKnuckle = rightHandAnchor.skeleton.joint(named: .handThumbKnuckle)
-        let rightHandThumbTipPosition = rightHandAnchor.skeleton.joint(named: .handThumbTip)
-        let rightHandIndexFingerTip = rightHandAnchor.skeleton.joint(named: .handIndexFingerTip)
-        
-        guard leftHandIndexFingerTip.isTracked && leftHandThumbTipPosition.isTracked &&
-                rightHandIndexFingerTip.isTracked && rightHandThumbTipPosition.isTracked &&
-                leftHandThumbKnuckle.isTracked && rightHandThumbKnuckle.isTracked else {
+        guard
+            let leftHandThumbKnuckle = leftHandAnchor.handSkeleton?.joint(.thumbKnuckle),
+            let leftHandThumbTipPosition = leftHandAnchor.handSkeleton?.joint(.thumbTip),
+            let leftHandIndexFingerTip = leftHandAnchor.handSkeleton?.joint(.indexFingerTip),
+            let rightHandThumbKnuckle = rightHandAnchor.handSkeleton?.joint(.thumbKnuckle),
+            let rightHandThumbTipPosition = rightHandAnchor.handSkeleton?.joint(.thumbTip),
+            let rightHandIndexFingerTip = rightHandAnchor.handSkeleton?.joint(.indexFingerTip),
+            leftHandIndexFingerTip.isTracked && leftHandThumbTipPosition.isTracked &&
+            rightHandIndexFingerTip.isTracked && rightHandThumbTipPosition.isTracked &&
+            leftHandThumbKnuckle.isTracked && rightHandThumbKnuckle.isTracked
+        else {
             return nil
         }
         

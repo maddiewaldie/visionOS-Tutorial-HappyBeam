@@ -22,14 +22,14 @@ struct HappyBeamSpace: View {
     @ObservedObject var gestureModel: HeartGestureModel
     @EnvironmentObject var gameModel: GameModel
     
-    @State var emittingBeam = false
-    @State var blasterPosition = Float(0)
-    @State var lastGestureUpdateTime: TimeInterval = 0
-    @State var draggedEntity: Entity? = nil
-    @State var positions: [SIMD3<Float>] = []
-    @State var orientations: [simd_quatf] = []
-    @State var collisionSubscription: EventSubscription?
-    @State var activationSubscription: EventSubscription?
+    @State private var emittingBeam = false
+    @State private var blasterPosition = Float(0)
+    @State private var lastGestureUpdateTime: TimeInterval = 0
+    @State private var draggedEntity: Entity? = nil
+    @State private var positions: [SIMD3<Float>] = []
+    @State private var orientations: [simd_quatf] = []
+    @State private var collisionSubscription: EventSubscription?
+    @State private var activationSubscription: EventSubscription?
     
     var collisionEntity = Entity()
     
@@ -340,7 +340,7 @@ func addFloorBeamMaterials() async throws {
 func loadFromRealityComposerPro(named entityName: String, fromSceneNamed sceneName: String) async -> Entity? {
     var entity: Entity? = nil
     do {
-        let scene = try await Entity.load(named: sceneName, in: happyBeamAssetsBundle)
+        let scene = try await Entity(named: sceneName, in: happyBeamAssetsBundle)
         entity = scene.findEntity(named: entityName)
     } catch {
         print("Error loading \(entityName) from scene \(sceneName): \(error.localizedDescription)")

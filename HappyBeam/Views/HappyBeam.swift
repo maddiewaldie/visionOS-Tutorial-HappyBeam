@@ -14,9 +14,9 @@ struct HappyBeam: View {
     @Environment(\.openImmersiveSpace) private var openImmersiveSpace
     @EnvironmentObject var gameModel: GameModel
     
-    @State var session: GroupSession<HeartProjection>? = nil
-    @State var timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-    @State var subscriptions = Set<AnyCancellable>()
+    @State private var session: GroupSession<HeartProjection>? = nil
+    @State private var timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    @State private var subscriptions = Set<AnyCancellable>()
     
     var body: some View {
         let gameState = GameScreen.from(state: gameModel)

@@ -12,7 +12,7 @@ struct Start: View {
     @EnvironmentObject var gameModel: GameModel
     @Environment(\.openImmersiveSpace) private var openImmersiveSpace
     
-    @StateObject var groupStateObserver = GroupStateObserver()
+    @StateObject private var groupStateObserver = GroupStateObserver()
     
     var body: some View {
         VStack(spacing: 10) {
