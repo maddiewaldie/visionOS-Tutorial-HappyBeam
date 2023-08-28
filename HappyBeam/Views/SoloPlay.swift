@@ -99,7 +99,7 @@ struct SoloPlay: View {
                 let shouldAddProjector = gameModel.inputKind == .alternative
                 #endif
 
-                if shouldAddProjector {
+                if shouldAddProjector, heart != nil {
                     try await addFloorBeamMaterials()
                 }
             } catch {

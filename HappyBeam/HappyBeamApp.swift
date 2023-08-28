@@ -23,7 +23,7 @@ struct HappyBeamApp: App {
                         return
                     }
                         
-                    windowScene.requestGeometryUpdate(.Reality(resizingRestrictions: UIWindowScene.ResizingRestrictions.none))
+                    windowScene.requestGeometryUpdate(.Vision(resizingRestrictions: UIWindowScene.ResizingRestrictions.none))
                 }
         }
         .windowStyle(.plain)

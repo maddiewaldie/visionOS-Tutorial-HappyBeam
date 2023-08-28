@@ -102,15 +102,27 @@ class HeartGestureModel: ObservableObject, @unchecked Sendable {
         }
         
         // Get the position of all joints in world coordinates.
-        let leftHandThumbKnuckleWorldPosition = matrix_multiply(leftHandAnchor.transform, leftHandThumbKnuckle.rootTransform).columns.3.xyz
-        let leftHandThumbTipWorldPosition = matrix_multiply(leftHandAnchor.transform, leftHandThumbTipPosition.rootTransform).columns.3.xyz
-        let leftHandIndexFingerTipWorldPosition = matrix_multiply(leftHandAnchor.transform, leftHandIndexFingerTip.rootTransform).columns.3.xyz
-        let rightHandThumbKnuckleWorldPosition = matrix_multiply(rightHandAnchor.transform, rightHandThumbKnuckle.rootTransform).columns.3.xyz
-        let rightHandThumbTipWorldPosition = matrix_multiply(rightHandAnchor.transform, rightHandThumbTipPosition.rootTransform).columns.3.xyz
-        let rightHandIndexFingerTipWorldPosition = matrix_multiply(rightHandAnchor.transform, rightHandIndexFingerTip.rootTransform).columns.3.xyz
+        let originFromLeftHandThumbKnuckleTransform = matrix_multiply(
+            leftHandAnchor.originFromAnchorTransform, leftHandThumbKnuckle.anchorFromJointTransform
+        ).columns.3.xyz
+        let originFromLeftHandThumbTipTransform = matrix_multiply(
+            leftHandAnchor.originFromAnchorTransform, leftHandThumbTipPosition.anchorFromJointTransform
+        ).columns.3.xyz
+        let originFromLeftHandIndexFingerTipTransform = matrix_multiply(
+            leftHandAnchor.originFromAnchorTransform, leftHandIndexFingerTip.anchorFromJointTransform
+        ).columns.3.xyz
+        let originFromRightHandThumbKnuckleTransform = matrix_multiply(
+            rightHandAnchor.originFromAnchorTransform, rightHandThumbKnuckle.anchorFromJointTransform
+        ).columns.3.xyz
+        let originFromRightHandThumbTipTransform = matrix_multiply(
+            rightHandAnchor.originFromAnchorTransform, rightHandThumbTipPosition.anchorFromJointTransform
+        ).columns.3.xyz
+        let originFromRightHandIndexFingerTipTransform = matrix_multiply(
+            rightHandAnchor.originFromAnchorTransform, rightHandIndexFingerTip.anchorFromJointTransform
+        ).columns.3.xyz
         
-        let indexFingersDistance = distance(leftHandIndexFingerTipWorldPosition, rightHandIndexFingerTipWorldPosition)
-        let thumbsDistance = distance(leftHandThumbTipWorldPosition, rightHandThumbTipWorldPosition)
+        let indexFingersDistance = distance(originFromLeftHandIndexFingerTipTransform, originFromRightHandIndexFingerTipTransform)
+        let thumbsDistance = distance(originFromLeftHandThumbTipTransform, originFromRightHandThumbTipTransform)
         
         // Heart gesture detection is true when the distance between the index finger tips centers
         // and the distance between the thumb tip centers is each less than four centimeters.
@@ -120,14 +132,14 @@ class HeartGestureModel: ObservableObject, @unchecked Sendable {
         }
         
         // Compute a position in the middle of the heart gesture.
-        let halfway = (rightHandIndexFingerTipWorldPosition - leftHandThumbTipWorldPosition) / 2
-        let heartMidpoint = rightHandIndexFingerTipWorldPosition - halfway
+        let halfway = (originFromRightHandIndexFingerTipTransform - originFromLeftHandThumbTipTransform) / 2
+        let heartMidpoint = originFromRightHandIndexFingerTipTransform - halfway
         
         // Compute the vector from left thumb knuckle to right thumb knuckle and normalize (X axis).
-        let xAxis = normalize(rightHandThumbKnuckleWorldPosition - leftHandThumbKnuckleWorldPosition)
+        let xAxis = normalize(originFromRightHandThumbKnuckleTransform - originFromLeftHandThumbKnuckleTransform)
         
         // Compute the vector from right thumb tip to right index finger tip and normalize (Y axis).
-        let yAxis = normalize(rightHandIndexFingerTipWorldPosition - rightHandThumbTipWorldPosition)
+        let yAxis = normalize(originFromRightHandIndexFingerTipTransform - originFromRightHandThumbTipTransform)
         
         let zAxis = normalize(cross(xAxis, yAxis))
         

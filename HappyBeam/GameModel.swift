@@ -214,7 +214,7 @@ class GameModel: ObservableObject {
             
             do {
                 for number in 1...4 {
-                    let resource = try await AudioFileResource.load(named: "cloudHit\(number).m4a")
+                    let resource = try await AudioFileResource(named: "cloudHit\(number).m4a")
                     cloudSounds.append(resource)
                 }
             } catch {
