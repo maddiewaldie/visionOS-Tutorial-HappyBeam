@@ -8,7 +8,7 @@ The score screen for single player.
 import SwiftUI
 
 struct SoloScore: View {
-    @EnvironmentObject var gameModel: GameModel
+    @Environment(GameModel.self) var gameModel
     @Environment(\.dismissImmersiveSpace) var dismissImmersiveSpace
 
     var body: some View {
@@ -51,6 +51,11 @@ struct SoloScore: View {
     func playAgain() {
         let inputChoice = gameModel.inputKind
         gameModel.reset()
+        
+        if beamIntermediate.parent == nil {
+            spaceOrigin.addChild(beamIntermediate)
+        }
+        
         gameModel.isPlaying = true
         gameModel.isInputSelected = true
         gameModel.isCountDownReady = true
@@ -65,7 +70,7 @@ struct SoloScore: View {
 
 #Preview {
     SoloScore()
-        .environmentObject(GameModel())
+        .environment(GameModel())
         .glassBackgroundEffect(
             in: RoundedRectangle(
                 cornerRadius: 32,

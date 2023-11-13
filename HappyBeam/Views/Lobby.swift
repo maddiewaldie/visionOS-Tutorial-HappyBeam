@@ -8,7 +8,7 @@ The input selection and waiting screen before the game starts.
 import SwiftUI
 
 struct Lobby: View {
-    @EnvironmentObject var gameModel: GameModel
+    @Environment(GameModel.self) var gameModel
     
     var progressValue: Float {
         min(1, max(0, Float(gameModel.countDown) / 3.0 + 0.01))
@@ -29,7 +29,7 @@ struct Lobby: View {
                 .labelsHidden()
                 .animation(.default, value: progressValue)
                 .gaugeStyle(.accessoryCircularCapacity)
-                .scaleEffect(3)
+                .scaleEffect(x: 3, y: 3, z: 1)
                 .frame(width: 150, height: 150)
                 .padding(75)
                 .overlay {
@@ -118,7 +118,13 @@ struct Lobby: View {
     
     func multiReady() {
         print("Sending local ready message for: ", sessionInfo?.session?.localParticipant.id.asPlayerName as Any)
-        Player.local?.isReady = true
+        
+        guard let localPlayer = gameModel.players.first(where: { $0.name == Player.localName }) else {
+            print("Local Player isn't set")
+            return
+        }
+        
+        localPlayer.isReady = true
         gameModel.players = gameModel.players.filter { _ in true }
         sessionInfo?.reliableMessenger?.send(ReadyStateMessage(ready: true)) { error in
             if error != nil {
@@ -148,7 +154,7 @@ struct Lobby: View {
 
 #Preview {
     Lobby()
-        .environmentObject(GameModel())
+        .environment(GameModel())
         .glassBackgroundEffect(
             in: RoundedRectangle(
                 cornerRadius: 32,

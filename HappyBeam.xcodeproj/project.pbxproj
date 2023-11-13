@@ -53,6 +53,7 @@
 		322C5442291D892800C32983 /* HeartGestureModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartGestureModel.swift; sourceTree = "<group>"; };
 		32372A622991920F00F10755 /* HappyBeam.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HappyBeam.swift; sourceTree = "<group>"; };
 		32372A642991951F00F10755 /* Players.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Players.swift; sourceTree = "<group>"; };
+		323FE0072B02EA5F0097340F /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		324EA74A297B2286005A6B3B /* Multiplayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Multiplayer.swift; sourceTree = "<group>"; };
 		324F3044298ACB0B00200F22 /* Start.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Start.swift; sourceTree = "<group>"; };
 		324F3046298AE68600200F22 /* SoloPlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoloPlay.swift; sourceTree = "<group>"; };
@@ -77,7 +78,6 @@
 		32D0FA0E291EE85800FF07D8 /* HappyBeamSpace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HappyBeamSpace.swift; sourceTree = "<group>"; };
 		69D019E13699007BC04C1F1F /* SampleCode.xcconfig */ = {isa = PBXFileReference; name = SampleCode.xcconfig; path = Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
 		9823BBED79461E85755AF17F /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; path = LICENSE.txt; sourceTree = "<group>"; };
-		ED3D237E05355BAACB8BB58E /* README.md */ = {isa = PBXFileReference; name = README.md; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,7 +103,7 @@
 		321A0C02291C02B70042A987 = {
 			isa = PBXGroup;
 			children = (
-				ED3D237E05355BAACB8BB58E /* README.md */,
+				323FE0072B02EA5F0097340F /* README.md */,
 				321A0C0D291C02B80042A987 /* HappyBeam */,
 				32C96CBE2A2FED900030AA37 /* Packages */,
 				321A0C0C291C02B80042A987 /* Products */,

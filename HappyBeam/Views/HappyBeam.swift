@@ -12,7 +12,7 @@ import RealityKit
 
 struct HappyBeam: View {
     @Environment(\.openImmersiveSpace) private var openImmersiveSpace
-    @EnvironmentObject var gameModel: GameModel
+    @Environment(GameModel.self) var gameModel
     
     @State private var session: GroupSession<HeartProjection>? = nil
     @State private var timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
@@ -47,7 +47,10 @@ struct HappyBeam: View {
         }
         
         .onReceive(timer) { _ in
-            if (gameModel.isPlaying && gameModel.isSoloReady) || (gameModel.isSharePlaying && gameModel.players.allSatisfy({ $0.isReady })) {
+            if (
+                gameModel.isPlaying && gameModel.isSoloReady) || (gameModel.isSharePlaying &&
+                gameModel.players.count > 1 && gameModel.players.allSatisfy({ $0.isReady })
+            ) {
                 if gameModel.timeLeft > 0 && !gameModel.isPaused {
                     gameModel.timeLeft -= 1
                     if (gameModel.timeLeft % 5 == 0 || gameModel.timeLeft == GameModel.gameTime - 1) && gameModel.timeLeft > 4 {
@@ -90,10 +93,11 @@ struct HappyBeam: View {
             sessionInfo = .init()
             for await newSession in HeartProjection.sessions() {
                 print("New GroupActivities session", newSession)
+                
+                newSession.join()
 
                 session = newSession
                 sessionInfo?.session = newSession
-                gameModel.isSharePlaying = true
                 
                 // Spatial coordination.
                 if let coordinator = await newSession.systemCoordinator {
@@ -115,19 +119,24 @@ struct HappyBeam: View {
                 
                 do {
                     print("Waiting before starting group activity.")
-                    try await Task.sleep(for: .seconds(3))
+                    
+                    while newSession.activeParticipants.isEmpty {
+                        try await Task.sleep(for: .seconds(3))
+                    }
                 } catch {
                     print("Couldn't sleep.", error)
                 }
+                
+                gameModel.isSharePlaying = true
                 
                 gameModel.players = newSession.activeParticipants.map { participant in
                     Player(name: String(participant.id.asPlayerName), score: 0, color: .random())
                 }
                 
-                Player.local = gameModel.players.first(where: { $0.name == newSession.localParticipant.id.asPlayerName })
+                Player.localName = newSession.localParticipant.id.asPlayerName
                 
                 // Add beams for players who aren't the `local` player.
-                gameModel.players.filter { $0.name != Player.local!.name }.forEach { player in
+                gameModel.players.filter { $0.name != Player.localName }.forEach { player in
                     Task {
                         multiBeamMap[player.name] = await initialBeam(for: player)
                     }
@@ -136,10 +145,18 @@ struct HappyBeam: View {
                 Task {
                     for try await updatedPlayerList in newSession.$activeParticipants.values {
                         for participant in updatedPlayerList {
-                            Player.local = gameModel.players.first(where: { $0.name == newSession.localParticipant.id.asPlayerName })
                             let potentialNewPlayer = Player(name: String(participant.id.asPlayerName), score: 0, color: .random())
                             if !gameModel.players.contains(where: { $0.name == potentialNewPlayer.name }) {
                                 gameModel.players.append(potentialNewPlayer)
+                                
+                                if let localPlayer = gameModel.players.first(where: { $0.name == Player.localName }),
+                                   localPlayer.isReady {
+                                    sessionInfo?.reliableMessenger?.send(ReadyStateMessage(ready: true)) { error in
+                                        if error != nil {
+                                            print("Send score error:", error!)
+                                        }
+                                    }
+                                }
                                 
                                 Task {
                                     multiBeamMap[potentialNewPlayer.name] = await initialBeam(for: potentialNewPlayer)
@@ -153,8 +170,6 @@ struct HappyBeam: View {
                 
                 sessionInfo?.messenger = GroupSessionMessenger(session: newSession, deliveryMode: .unreliable)
                 sessionInfo?.reliableMessenger = GroupSessionMessenger(session: newSession, deliveryMode: .reliable)
-                
-                newSession.join()
                 
                 newSession.$state.sink { state in
                     if case .invalidated = state {
@@ -210,7 +225,7 @@ struct HappyBeam: View {
 
 #Preview {
     HappyBeam()
-        .environmentObject(GameModel())
+        .environment(GameModel())
 }
 
 extension UUID {

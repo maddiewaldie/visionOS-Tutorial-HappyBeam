@@ -8,7 +8,7 @@ The score screen for multiplayer.
 import SwiftUI
 
 struct MultiScore: View {
-    @EnvironmentObject var gameModel: GameModel
+    @Environment(GameModel.self) var gameModel
     @Environment(\.dismissImmersiveSpace) var dismissImmersiveSpace
     
     var body: some View {
@@ -68,7 +68,7 @@ struct MultiScore: View {
         #if targetEnvironment(simulator)
         gameModel.players.first!
         #else
-        gameModel.players.first(where: { $0.name == Player.local?.name })!
+        gameModel.players.first(where: { $0.name == Player.localName })!
         #endif
     }
     
@@ -83,6 +83,11 @@ struct MultiScore: View {
     func playAgain() {
         let inputChoice = gameModel.inputKind
         gameModel.reset()
+        
+        if beamIntermediate.parent == nil {
+            spaceOrigin.addChild(beamIntermediate)
+        }
+        
         gameModel.isPlaying = true
         gameModel.isInputSelected = true
         gameModel.isCountDownReady = true
@@ -97,7 +102,7 @@ struct MultiScore: View {
 
 #Preview {
     MultiScore()
-        .environmentObject(GameModel())
+        .environment(GameModel())
         .glassBackgroundEffect(
             in: RoundedRectangle(
                 cornerRadius: 32,

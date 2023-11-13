@@ -21,7 +21,7 @@ class Player {
     }
     
     /// The local player, "me".
-    static var local: Player? = nil
+    static var localName: String = ""
 }
 
 /// A set of fake players for use in previews and testing.

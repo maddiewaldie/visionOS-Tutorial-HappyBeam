@@ -9,7 +9,7 @@ import SwiftUI
 import GroupActivities
 
 struct Start: View {
-    @EnvironmentObject var gameModel: GameModel
+    @Environment(GameModel.self) var gameModel
     @Environment(\.openImmersiveSpace) private var openImmersiveSpace
     
     @StateObject private var groupStateObserver = GroupStateObserver()
@@ -76,7 +76,7 @@ struct Start: View {
 
 #Preview {
     Start()
-        .environmentObject(GameModel())
+        .environment(GameModel())
         .glassBackgroundEffect(
             in: RoundedRectangle(
                 cornerRadius: 32,

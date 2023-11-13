@@ -9,18 +9,14 @@ import Accelerate
 import AVKit
 import Combine
 import GameController
-#if targetEnvironment(simulator)
 import RealityKit
-#else
-@preconcurrency import RealityKit
-#endif
 import SwiftUI
 import HappyBeamAssets
 
 /// The Full Space that displays when someone plays the game.
 struct HappyBeamSpace: View {
     @ObservedObject var gestureModel: HeartGestureModel
-    @EnvironmentObject var gameModel: GameModel
+    @Environment(GameModel.self) var gameModel
     
     @State private var emittingBeam = false
     @State private var blasterPosition = Float(0)
@@ -64,6 +60,9 @@ struct HappyBeamSpace: View {
                                     }
                                     gameModel.controllerInputX = pad.leftThumbstick.xAxis.value
                                     gameModel.controllerInputY = pad.leftThumbstick.yAxis.value
+                                    if gameModel.controllerInputX != 0, gameModel.controllerInputY != 0 {
+                                        gameModel.controllerLastInput = Date.timeIntervalSinceReferenceDate
+                                    }
                                 }
                             }
                             
@@ -75,6 +74,9 @@ struct HappyBeamSpace: View {
                                         }
                                         gameModel.controllerInputX = pad.dpad.xAxis.value
                                         gameModel.controllerInputY = pad.dpad.yAxis.value
+                                        if gameModel.controllerInputX != 0, gameModel.controllerInputY != 0 {
+                                            gameModel.controllerLastInput = Date.timeIntervalSinceReferenceDate
+                                        }
                                     }
                                 }
                             }
@@ -128,10 +130,6 @@ struct HappyBeamSpace: View {
                     }
                 }
             }
-            
-            if gameModel.isUsingControllerInput {
-                gameControllerLoop()
-            }
         }
         .gesture(DragGesture(minimumDistance: 0.0)
             .targetedToAnyEntity()
@@ -169,6 +167,10 @@ struct HappyBeamSpace: View {
                     )
                 
                 entity.orientation = simd_quatf(newOrientation)
+                
+                if gameModel.isSharePlaying {
+                    sendBeamPositionUpdate(Pose3D(entity.transform.matrix)!)
+                }
             }
             .onEnded { dragEnd in
                 if !gameModel.isPaused {
@@ -187,6 +189,9 @@ struct HappyBeamSpace: View {
         }
         .task {
             await gestureModel.monitorSessionEvents()
+        }
+        .onChange(of: gameModel.controllerLastInput) {
+            gameControllerLoop()
         }
     }
     
@@ -263,13 +268,16 @@ struct HappyBeamSpace: View {
     @MainActor
     func gameControllerLoop() {
         Task { @MainActor in
-            let speed: Float = 0.75
+            #if targetEnvironment(simulator)
+            let speed: Float = 0.4
+            #else
+            let speed: Float = 0.7
+            #endif
             gameModel.controllerX += gameModel.controllerInputX * speed
             gameModel.controllerY -= gameModel.controllerInputY * speed
             
             let heart = globalHeart!
             if !isFloorBeamShowing && (gameModel.controllerInputX != 0.0 || gameModel.controllerInputX != 0.0) {
-                gameModel.controllerLastInput = Date.timeIntervalSinceReferenceDate
                 heart.addChild(floorBeam)
                 emittingBeam = true
                 startBlasterBeam(for: heart, beamType: .turret)
@@ -278,19 +286,24 @@ struct HappyBeamSpace: View {
                         .rotated(by: .init(angle: .degrees(180), axis: .y))
                 )
                 isFloorBeamShowing = true
-            } else {
-                let elapsedTime = Date.timeIntervalSinceReferenceDate - gameModel.controllerLastInput
-                if gameModel.controllerInputX == 0.0, gameModel.controllerInputX == 0.0, elapsedTime > 3 {
-                    heart.removeChild(floorBeam)
-                    isFloorBeamShowing = false
-                    endBlasterBeam()
-                }
             }
             
             heart.orientation = simd_quatf(
                 Rotation3D(angle: .degrees(Double(-gameModel.controllerX)), axis: .z)
                     .rotated(by: .init(angle: .degrees(Double(-gameModel.controllerY)), axis: .x))
             )
+            
+            if let timer = gameModel.controllerDismissTimer {
+                timer.invalidate()
+            }
+
+            gameModel.controllerDismissTimer = Timer.scheduledTimer(withTimeInterval: 3, repeats: false) { _ in
+                Task { @MainActor in
+                    heart.removeChild(floorBeam)
+                    isFloorBeamShowing = false
+                    endBlasterBeam()
+                }
+            }
         }
     }
 }

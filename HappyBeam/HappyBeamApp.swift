@@ -11,13 +11,13 @@ import RealityKit
 /// The structure of the Happy Beam app: a main window and a Full Space for gameplay.
 @main
 struct HappyBeamApp: App {
-    @StateObject private var gameModel = GameModel()
+    @State private var gameModel = GameModel()
     @State private var immersionState: ImmersionStyle = .mixed
     
     var body: some SwiftUI.Scene {
         WindowGroup("HappyBeam", id: "happyBeamApp") {
             HappyBeam()
-                .environmentObject(gameModel)
+                .environment(gameModel)
                 .onAppear {
                     guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene else {
                         return
@@ -30,7 +30,7 @@ struct HappyBeamApp: App {
         
         ImmersiveSpace(id: "happyBeam") {
             HappyBeamSpace(gestureModel: HeartGestureModelContainer.heartGestureModel)
-                .environmentObject(gameModel)
+                .environment(gameModel)
         }
         .immersionStyle(selection: $immersionState, in: .mixed)
     }

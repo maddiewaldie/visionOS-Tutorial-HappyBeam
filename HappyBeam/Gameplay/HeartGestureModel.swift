@@ -5,11 +5,7 @@ Abstract:
 Hand tracking updates.
 */
 
-#if targetEnvironment(simulator)
 import ARKit
-#else
-@preconcurrency import ARKit
-#endif
 import SwiftUI
 
 /// A model that contains up-to-date hand coordinate information.

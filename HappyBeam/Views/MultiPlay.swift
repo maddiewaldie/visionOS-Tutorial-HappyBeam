@@ -8,7 +8,7 @@ The play screen for multiplayer.
 import SwiftUI
 
 struct MultiPlay: View {
-    @EnvironmentObject var gameModel: GameModel
+    @Environment(GameModel.self) var gameModel
     @Environment(\.dismissImmersiveSpace) var dismissImmersiveSpace
     
     var body: some View {
@@ -100,13 +100,28 @@ struct MultiPlay: View {
             .padding(.vertical, 12)
         }
         .frame(width: 260)
+        .task {
+            do {
+                #if targetEnvironment(simulator)
+                let shouldAddProjector = true
+                #else
+                let shouldAddProjector = gameModel.inputKind == .alternative
+                #endif
+
+                if shouldAddProjector, heart != nil {
+                    try await addFloorBeamMaterials()
+                }
+            } catch {
+                print(error)
+            }
+        }
     }
     
     var you: Player {
         #if targetEnvironment(simulator)
         gameModel.players.first!
         #else
-        gameModel.players.first(where: { $0.name == Player.local?.name })!
+        gameModel.players.first(where: { $0.name == Player.localName })!
         #endif
     }
     
@@ -121,7 +136,7 @@ struct MultiPlay: View {
 
 #Preview {
     MultiPlay()
-        .environmentObject(GameModel())
+        .environment(GameModel())
         .glassBackgroundEffect(
             in: RoundedRectangle(
                 cornerRadius: 32,

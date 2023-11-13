@@ -10,9 +10,10 @@ import RealityKit
 import SwiftUI
 
 /// State that drives the different screens of the game and options that players select.
-class GameModel: ObservableObject {
-    @Published var isPlaying = false
-    @Published var isPaused = false {
+@Observable
+class GameModel {
+    var isPlaying = false
+    var isPaused = false {
         didSet {
             if isPaused == true {
                 gameplayPlayer.pause()
@@ -56,17 +57,17 @@ class GameModel: ObservableObject {
     }
     
     /// A Boolean value that indicates that game assets have loaded.
-    @Published var readyToStart = false
+    var readyToStart = false
     
     // Music players.
     var victoryPlayer = try! AVAudioPlayer(contentsOf: Bundle.main.url(forResource: "happyBeamVictory", withExtension: "m4a")!)
     var gameplayPlayer = try! AVAudioPlayer(contentsOf: Bundle.main.url(forResource: "happyBeamGameplay", withExtension: "m4a")!)
     var menuPlayer = try! AVAudioPlayer(contentsOf: Bundle.main.url(forResource: "happyBeamMenu", withExtension: "m4a")!)
     
-    @Published var isSharePlaying = false
-    @Published var isSpatial = false
+    var isSharePlaying = false
+    var isSpatial = false
     
-    @Published var isFinished = false {
+    var isFinished = false {
         didSet {
             if isFinished == true {
                 clear()
@@ -80,7 +81,7 @@ class GameModel: ObservableObject {
         }
     }
     
-    @Published var isSoloReady = false {
+    var isSoloReady = false {
         didSet {
             if isPlaying == true {
                 victoryPlayer.pause()
@@ -93,8 +94,8 @@ class GameModel: ObservableObject {
     }
     
     static let gameTime = 35
-    @Published var timeLeft = gameTime
-    @Published var isCountDownReady = false {
+    var timeLeft = gameTime
+    var isCountDownReady = false {
         didSet {
             if isCountDownReady == true {
                 menuPlayer.setVolume(0, fadeDuration: Double(countDown))
@@ -102,9 +103,9 @@ class GameModel: ObservableObject {
         }
     }
     
-    @Published var countDown = 3
-    @Published var score = 0
-    @Published var isMuted = false {
+    var countDown = 3
+    var score = 0
+    var isMuted = false {
         didSet {
             if isMuted == true {
                 gameplayPlayer.pause()
@@ -113,19 +114,20 @@ class GameModel: ObservableObject {
             }
         }
     }
-    @Published var isInputSelected = false
-    @Published var inputKind: InputKind = .hands
+    var isInputSelected = false
+    var inputKind: InputKind = .hands
     
-    @Published var players = initialPlayers
-    @Published var clouds: [Cloud] = (0..<30).map { Cloud(id: $0, isHappy: false) }
-    @Published var cloudSounds = [AudioFileResource]()
+    var players = initialPlayers
+    var clouds: [Cloud] = (0..<30).map { Cloud(id: $0, isHappy: false) }
+    var cloudSounds = [AudioFileResource]()
     
-    @Published var isUsingControllerInput = false
-    @Published var controllerX: Float = 0
-    @Published var controllerY: Float = 90.0
-    @Published var controllerInputX: Float = 0
-    @Published var controllerInputY: Float = 0
-    @Published var controllerLastInput = Date.timeIntervalSinceReferenceDate
+    var isUsingControllerInput = false
+    var controllerX: Float = 0
+    var controllerY: Float = 90.0
+    var controllerInputX: Float = 0
+    var controllerInputY: Float = 0
+    var controllerLastInput = Date.timeIntervalSinceReferenceDate
+    var controllerDismissTimer: Timer?
 
     /// Removes 3D content when then game is over.
     func clear() {
@@ -148,7 +150,7 @@ class GameModel: ObservableObject {
         players = initialPlayers
         
         #if targetEnvironment(simulator)
-        Player.local = players.first!
+        Player.localName = players.first!.name
         #endif
         
         clouds = (0..<30).map { Cloud(id: $0, isHappy: false) }

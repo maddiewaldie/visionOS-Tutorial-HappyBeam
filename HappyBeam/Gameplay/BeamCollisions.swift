@@ -62,8 +62,8 @@ func handleCollisionStart(for event: CollisionEvents.Began, gameModel: GameModel
 func handleCloudHit(for cloud: Entity, gameModel: GameModel, remote: Bool = false) throws {
     gameModel.score += 1
     
-    if remote == false {
-        Player.local?.score += 1
+    if let localPlayer = gameModel.players.first(where: { $0.name == Player.localName }) {
+        localPlayer.score += 1
     }
     
     cloudAnimate(cloud, kind: .smile, shouldRepeat: false)

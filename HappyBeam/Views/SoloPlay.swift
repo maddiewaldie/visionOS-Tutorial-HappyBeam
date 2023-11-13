@@ -8,7 +8,7 @@ The play screen for single player.
 import SwiftUI
 
 struct SoloPlay: View {
-    @EnvironmentObject var gameModel: GameModel
+    @Environment(GameModel.self) var gameModel
     @Environment(\.dismissImmersiveSpace) var dismissImmersiveSpace
     
     var body: some View {
@@ -113,7 +113,7 @@ struct SoloPlay: View {
     VStack {
         Spacer()
         SoloPlay()
-            .environmentObject(GameModel())
+            .environment(GameModel())
             .glassBackgroundEffect(
                 in: RoundedRectangle(
                     cornerRadius: 32,
