@@ -213,7 +213,7 @@
 				9823BBED79461E85755AF17F /* LICENSE.txt */,
 			);
 			name = LICENSE;
-			path = LICENSE;
+			path = .;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

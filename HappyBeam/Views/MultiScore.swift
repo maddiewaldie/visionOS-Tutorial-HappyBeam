@@ -94,6 +94,7 @@ struct MultiScore: View {
         gameModel.inputKind = inputChoice
     }
     
+    @MainActor
     func goBackToStart() async {
         await dismissImmersiveSpace()
         gameModel.reset()
